@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Lattice_boltzmann
@@ -28,6 +29,15 @@ namespace Lattice_boltzmann
         private void utworz10CzasteczkeButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < 10; i++) { Rysowanie.nowaCzasteczka(pictureBox1); }
+        }
+
+        private void testButton_Click(object sender, EventArgs e)
+        {
+            Graphics g = pictureBox1.CreateGraphics();
+            Pen pen = new Pen(Color.Red,3);
+            Point p1 = new Point(0, 0);
+            Point p2 = new Point(582-50, 386-50);
+            g.DrawLine(pen ,p1,p2);
         }
     }
 }

@@ -9,10 +9,11 @@ namespace Lattice_boltzmann
     {
         public static Graphics g;
         public static Pen penBlue = new System.Drawing.Pen(Color.Blue, 3);
+        public static SolidBrush brushBlue = new SolidBrush(Color.Blue);
         //public static Pen penWhite = new System.Drawing.Pen(Color.White, 3);
         public static Pen penDefault = new System.Drawing.Pen(Color.FromArgb(240, 240, 240), 3);
         public static List<Czasteczka> czasteczka = new List<Czasteczka>();
-        public static int rozmiarCzasteczki = 5;
+        public static int rozmiarCzasteczki = 3;
 
         public static void nowaCzasteczka(PictureBox pictureBox1)
         {
@@ -31,7 +32,8 @@ namespace Lattice_boltzmann
             g = pictureBox1.CreateGraphics();
             RectangleF rectangleF = new RectangleF(x,y, rozmiarCzasteczki, rozmiarCzasteczki);
             czasteczka.Add(new Czasteczka(x,y, kierunek));
-            g.DrawEllipse(penBlue,rectangleF);
+            //g.DrawEllipse(penBlue,rectangleF);
+            g.FillRectangle(brushBlue, rectangleF);
         }
 
         public static void rysujCzasteczke(Czasteczka czasteczka, RectangleF rectangleF, PictureBox pictureBox1)

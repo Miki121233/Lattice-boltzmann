@@ -33,6 +33,7 @@ namespace Lattice_boltzmann
             this.startButton = new System.Windows.Forms.Button();
             this.utworzCzasteczkeButton = new System.Windows.Forms.Button();
             this.utworz10CzasteczkeButton = new System.Windows.Forms.Button();
+            this.testButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -75,11 +76,22 @@ namespace Lattice_boltzmann
             this.utworz10CzasteczkeButton.UseVisualStyleBackColor = true;
             this.utworz10CzasteczkeButton.Click += new System.EventHandler(this.utworz10CzasteczkeButton_Click);
             // 
+            // testButton
+            // 
+            this.testButton.Location = new System.Drawing.Point(635, 260);
+            this.testButton.Name = "testButton";
+            this.testButton.Size = new System.Drawing.Size(145, 37);
+            this.testButton.TabIndex = 4;
+            this.testButton.Text = "Test";
+            this.testButton.UseVisualStyleBackColor = true;
+            this.testButton.Click += new System.EventHandler(this.testButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.testButton);
             this.Controls.Add(this.utworz10CzasteczkeButton);
             this.Controls.Add(this.utworzCzasteczkeButton);
             this.Controls.Add(this.startButton);
@@ -92,11 +104,11 @@ namespace Lattice_boltzmann
         }
 
         #endregion
-
-        public static System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.Button utworzCzasteczkeButton;
         private System.Windows.Forms.Button utworz10CzasteczkeButton;
+        private System.Windows.Forms.Button testButton;
+        public static System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
