@@ -17,9 +17,17 @@ namespace Lattice_boltzmann
         public static void nowaCzasteczka(PictureBox pictureBox1)
         {
             Random random = new Random();
-            int x = random.Next(pictureBox1.Location.X, pictureBox1.Size.Width);
-            int y = random.Next(pictureBox1.Location.Y, pictureBox1.Size.Height);
-            int kierunek = random.Next(1, 5);
+            int kierunek = random.Next(-2, 3);
+        ponownaRandomizacja:
+            int x = random.Next(0, pictureBox1.Size.Width - rozmiarCzasteczki);
+            int y = random.Next(0, pictureBox1.Size.Height - rozmiarCzasteczki);
+            for (int i = 0; i < czasteczka.Count; i++)
+            {
+                if ((x < czasteczka[i].Lokalizacja.X - rozmiarCzasteczki || x > czasteczka[i].Lokalizacja.X + rozmiarCzasteczki) || 
+                    (y < czasteczka[i].Lokalizacja.Y - rozmiarCzasteczki || y > czasteczka[i].Lokalizacja.Y + rozmiarCzasteczki))
+                {}
+                else goto ponownaRandomizacja;
+            }
             g = pictureBox1.CreateGraphics();
             RectangleF rectangleF = new RectangleF(x,y, rozmiarCzasteczki, rozmiarCzasteczki);
             czasteczka.Add(new Czasteczka(x,y, kierunek));
