@@ -7,7 +7,7 @@ namespace Lattice_boltzmann
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
+        public static System.Windows.Forms.PictureBox pictureBox1;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -108,7 +108,6 @@ namespace Lattice_boltzmann
         private System.Windows.Forms.Button utworzCzasteczkeButton;
         private System.Windows.Forms.Button utworz10CzasteczkeButton;
         private System.Windows.Forms.Button testButton;
-        public static System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
