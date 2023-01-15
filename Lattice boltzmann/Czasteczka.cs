@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace Lattice_boltzmann
@@ -8,14 +9,35 @@ namespace Lattice_boltzmann
         
         public Czasteczka(int x, int y, int kierunek)
         {
+            Random rand = new Random();
+
             Lokalizacja = new Point(x,y);
             Kierunek = kierunek;
-            Szybkosc = 10;
+            Szybkosc = rand.Next(1, 10);//10;
+         
+            WspolczynnikWagowy = 1/4;
+            Masa = rand.Next(10,30);
+            CzasRelaksacji = 1;//rand.Next(1,1000000);
+            Feq = CzasRelaksacji * (1 + 3 * Szybkosc + 3 * Szybkosc * Szybkosc);
+            Stezenie = Feq / WspolczynnikWagowy;
+            
         }
         public int Szybkosc { get; set; }
         public int Kierunek { get; set; } // -1 -lewo, -2 -gora,  1 -prawo, 2 -dol
         public Point Lokalizacja { get; set; }
-        
+
+        public int Masa { get; set; }
+        public double CzasRelaksacji { get; set; }
+        public double Stezenie { get; set; }
+        public double WspolczynnikWagowy { get; set; }
+        public double Feq { get; set; } //równowaga lokalna
+
+        // F eq = w * C -> F eq = wspolczynnik_wagowy * stezenie 
+        // Fout = Fin + czasRelaksacji(Feq - Fin) => Fout = Feq
+        //zmiana stezenia koloru od stezenia
+        // Feq = czasRel*gestosc(1+3(wektorKierunku*predkosc) + 4.5(wektorKierunku*predkosc)^2 - 1.5 predkosc^2) =>
+        // Feq = czasRel * (1 + 3 predkosc + 4.5 predkosc^2 - 1.5 predkosc^2) = czasRel * (1+3predkosc + 3predkosc^2) 
+
         public void ruch()
         {
             if (warunkiRuchu() == true)
@@ -27,9 +49,28 @@ namespace Lattice_boltzmann
                             
                             Rysowanie.wyczyscCzasteczke(this, Form1.pictureBox1);
                             RectangleF rectangleF = new RectangleF(Lokalizacja.X - Szybkosc, Lokalizacja.Y, Rysowanie.rozmiarCzasteczki, Rysowanie.rozmiarCzasteczki);
-                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+                            for (int i = 0; i < Rysowanie.czasteczka.Count; i++)
+                            {
+                                if (Rysowanie.czasteczka[i].Lokalizacja.X == (int)rectangleF.X && Rysowanie.czasteczka[i].Lokalizacja.Y == (int)rectangleF.Y)
+                                { //warunek kolizji
+
+                                    //prawo zachowania pedu
+                                    int m1 = Masa; int v1 = Szybkosc;
+                                    int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
+                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + 2 * m2 * v2 / m1 + m2;
+                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + 2 * m1 * v1 / m1 + m2;
+                                    Szybkosc = u1;
+                                    Rysowanie.czasteczka[i].Szybkosc = u2;
+
+                                    Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
+                                    Kierunek = -Kierunek;
+
+                                    ruch();
+                                }
+
+                            }
                             Lokalizacja = new Point((int)rectangleF.X, (int)rectangleF.Y);
-                            
+                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
                         }
                         break;
                     case -2: // gora
@@ -37,9 +78,29 @@ namespace Lattice_boltzmann
                             
                             Rysowanie.wyczyscCzasteczke(this, Form1.pictureBox1);
                             RectangleF rectangleF = new RectangleF(Lokalizacja.X, Lokalizacja.Y + Szybkosc, Rysowanie.rozmiarCzasteczki, Rysowanie.rozmiarCzasteczki);
-                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+                            for (int i = 0; i < Rysowanie.czasteczka.Count; i++)
+                            {
+                                if (Rysowanie.czasteczka[i].Lokalizacja.X == (int)rectangleF.X && Rysowanie.czasteczka[i].Lokalizacja.Y == (int)rectangleF.Y)
+                                { //warunek kolizji
+
+                                    //prawo zachowania pedu
+                                    int m1 = Masa; int v1 = Szybkosc;
+                                    int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
+                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + 2 * m2 * v2 / m1 + m2;
+                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + 2 * m1 * v1 / m1 + m2;
+                                    Szybkosc = u1;
+                                    Rysowanie.czasteczka[i].Szybkosc = u2;
+
+                                    Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
+                                    Kierunek = -Kierunek;
+
+                                    ruch();
+                                }
+
+                            }
                             Lokalizacja = new Point((int)rectangleF.X, (int)rectangleF.Y);
-                            
+                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+
                         }
                         break;
                     case 1: // prawo
@@ -47,9 +108,29 @@ namespace Lattice_boltzmann
                            
                             Rysowanie.wyczyscCzasteczke(this, Form1.pictureBox1);
                             RectangleF rectangleF = new RectangleF(Lokalizacja.X + Szybkosc, Lokalizacja.Y, Rysowanie.rozmiarCzasteczki, Rysowanie.rozmiarCzasteczki);
-                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+                            for (int i = 0; i < Rysowanie.czasteczka.Count; i++)
+                            {
+                                if (Rysowanie.czasteczka[i].Lokalizacja.X == (int)rectangleF.X && Rysowanie.czasteczka[i].Lokalizacja.Y == (int)rectangleF.Y)
+                                { //warunek kolizji
+
+                                    //prawo zachowania pedu
+                                    int m1 = Masa; int v1 = Szybkosc;
+                                    int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
+                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + 2 * m2 * v2 / m1 + m2;
+                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + 2 * m1 * v1 / m1 + m2;
+                                    Szybkosc = u1;
+                                    Rysowanie.czasteczka[i].Szybkosc = u2;
+
+                                    Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
+                                    Kierunek = -Kierunek;
+
+                                    ruch();
+                                }
+
+                            }
                             Lokalizacja = new Point((int)rectangleF.X, (int)rectangleF.Y);
-                            
+                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+
                         }
                         break;
                     case 2: //dol
@@ -57,9 +138,29 @@ namespace Lattice_boltzmann
                             
                             Rysowanie.wyczyscCzasteczke(this, Form1.pictureBox1);
                             RectangleF rectangleF = new RectangleF(Lokalizacja.X, Lokalizacja.Y - Szybkosc, Rysowanie.rozmiarCzasteczki, Rysowanie.rozmiarCzasteczki);
-                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+                            for (int i = 0; i < Rysowanie.czasteczka.Count; i++)
+                            {
+                                if (Rysowanie.czasteczka[i].Lokalizacja.X == (int)rectangleF.X && Rysowanie.czasteczka[i].Lokalizacja.Y == (int)rectangleF.Y)
+                                { //warunek kolizji
+
+                                    //prawo zachowania pedu
+                                    int m1 = Masa; int v1 = Szybkosc;
+                                    int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
+                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + 2 * m2 * v2 / m1 + m2;   
+                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + 2 * m1 * v1 / m1 + m2;
+                                    Szybkosc = u1;
+                                    Rysowanie.czasteczka[i].Szybkosc = u2;
+
+                                    Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
+                                    Kierunek = -Kierunek;
+
+                                    ruch();
+                                }
+
+                            }
                             Lokalizacja = new Point((int)rectangleF.X, (int)rectangleF.Y);
-                            
+                            Rysowanie.rysujCzasteczke(this, rectangleF, Form1.pictureBox1);
+
                         }
                         break;
                     default:
@@ -81,7 +182,7 @@ namespace Lattice_boltzmann
             //Graphics g = Form1.pictureBox1.CreateGraphics();
            
             Bitmap b = new Bitmap(picturebox.ClientSize.Width, picturebox.Height);
-            picturebox.DrawToBitmap(b, picturebox.ClientRectangle);
+            picturebox.DrawToBitmap(b, picturebox.RectangleToScreen(picturebox.ClientRectangle));//picturebox.ClientRectangle);
             Color colour = new Color();
             int x=-1;
             int y=-1;
@@ -136,7 +237,7 @@ namespace Lattice_boltzmann
                 
             }
            
-            //b.Dispose();
+            b.Dispose();
             return true;
         }
 

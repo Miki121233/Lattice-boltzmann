@@ -32,15 +32,37 @@ namespace Lattice_boltzmann
             g = pictureBox1.CreateGraphics();
             RectangleF rectangleF = new RectangleF(x,y, rozmiarCzasteczki, rozmiarCzasteczki);
             czasteczka.Add(new Czasteczka(x,y, kierunek));
-            //g.DrawEllipse(penBlue,rectangleF);
-            g.FillRectangle(brushBlue, rectangleF);
+            
+            g.DrawEllipse(penBlue,rectangleF);
+            //g.FillRectangle(brushBlue, rectangleF);
         }
 
         public static void rysujCzasteczke(Czasteczka czasteczka, RectangleF rectangleF, PictureBox pictureBox1)
         {
             g = pictureBox1.CreateGraphics();
             //RectangleF rectangleF = new RectangleF(czasteczka.Lokalizacja.X, czasteczka.Lokalizacja.Y, 5, 5); 
-            g.DrawEllipse(penBlue, rectangleF);
+            Color color = Color.Red;
+
+            if (czasteczka.Szybkosc < 4)  //warunek od stezenia do koloru
+            {
+                color = Color.FromArgb(224, 223, 255);
+            }
+            else if (czasteczka.Szybkosc < 7 && czasteczka.Szybkosc >= 4)
+            {
+                color = Color.FromArgb(129, 125, 242);
+            }
+            else if (czasteczka.Szybkosc < 10 && czasteczka.Szybkosc >= 7)
+            {
+                color = Color.FromArgb(33, 26, 225);
+            }
+            else if (czasteczka.Szybkosc == 10) 
+            {
+                color = Color.FromArgb(6, 0, 169);
+            }
+            Pen penStezenie = new Pen(color, 3);
+
+            g.DrawEllipse(penStezenie, rectangleF);
+            //g.DrawEllipse(penBlue, rectangleF);
         }
 
         public static void wyczyscCzasteczke(Czasteczka czasteczka, PictureBox pictureBox1)
