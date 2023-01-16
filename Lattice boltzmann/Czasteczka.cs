@@ -57,14 +57,14 @@ namespace Lattice_boltzmann
                                     //prawo zachowania pedu
                                     int m1 = Masa; int v1 = Szybkosc;
                                     int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
-                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + 2 * m2 * v2 / m1 + m2;
-                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + 2 * m1 * v1 / m1 + m2;
+                                    int u1 = v1 * (m1 - m2) / (m1 + m2) + (2 * m2 * v2) / (m1 + m2);
+                                    int u2 = v2 * (m1 - m2) / (m1 + m2) + (2 * m1 * v1) / (m1 + m2);
                                     Szybkosc = u1;
                                     Rysowanie.czasteczka[i].Szybkosc = u2;
 
                                     Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
                                     Kierunek = -Kierunek;
-
+                                    Console.WriteLine("\n\nSzybkosci: " + u1 + ", " + u2+"\n");
                                     ruch();
                                 }
 
@@ -93,7 +93,7 @@ namespace Lattice_boltzmann
 
                                     Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
                                     Kierunek = -Kierunek;
-
+                                    Console.WriteLine("\n\nSzybkosci: " + u1 + ", " + u2 + "\n");
                                     ruch();
                                 }
 
@@ -123,7 +123,7 @@ namespace Lattice_boltzmann
 
                                     Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
                                     Kierunek = -Kierunek;
-
+                                    Console.WriteLine("\n\nSzybkosci: " + u1 + ", " + u2 + "\n");
                                     ruch();
                                 }
 
@@ -153,7 +153,7 @@ namespace Lattice_boltzmann
 
                                     Rysowanie.czasteczka[i].Kierunek = -Rysowanie.czasteczka[i].Kierunek;
                                     Kierunek = -Kierunek;
-
+                                    Console.WriteLine("\n\nSzybkosci: " + u1 + ", " + u2 + "\n");
                                     ruch();
                                 }
 

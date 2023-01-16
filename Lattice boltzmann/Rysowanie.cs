@@ -59,7 +59,11 @@ namespace Lattice_boltzmann
             {
                 color = Color.FromArgb(6, 0, 169);
             }
-            Pen penStezenie = new Pen(color, 3);
+            else if (czasteczka.Szybkosc > 10)
+            {
+                color = Color.FromArgb(4, 0, 120);
+            }
+                Pen penStezenie = new Pen(color, 3);
 
             g.DrawEllipse(penStezenie, rectangleF);
             //g.DrawEllipse(penBlue, rectangleF);

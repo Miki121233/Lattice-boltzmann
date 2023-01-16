@@ -7,7 +7,6 @@ namespace Lattice_boltzmann
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-        public static System.Windows.Forms.PictureBox pictureBox1;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -34,6 +33,7 @@ namespace Lattice_boltzmann
             this.utworzCzasteczkeButton = new System.Windows.Forms.Button();
             this.utworz10CzasteczkeButton = new System.Windows.Forms.Button();
             this.testButton = new System.Windows.Forms.Button();
+            this.deleteAllButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -78,7 +78,7 @@ namespace Lattice_boltzmann
             // 
             // testButton
             // 
-            this.testButton.Location = new System.Drawing.Point(635, 260);
+            this.testButton.Location = new System.Drawing.Point(635, 298);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(145, 37);
             this.testButton.TabIndex = 4;
@@ -86,11 +86,22 @@ namespace Lattice_boltzmann
             this.testButton.UseVisualStyleBackColor = true;
             this.testButton.Click += new System.EventHandler(this.testButton_Click);
             // 
+            // deleteAllButton
+            // 
+            this.deleteAllButton.Location = new System.Drawing.Point(635, 199);
+            this.deleteAllButton.Name = "deleteAllButton";
+            this.deleteAllButton.Size = new System.Drawing.Size(145, 37);
+            this.deleteAllButton.TabIndex = 5;
+            this.deleteAllButton.Text = "Usuń wszystkie cząsteczki";
+            this.deleteAllButton.UseVisualStyleBackColor = true;
+            this.deleteAllButton.Click += new System.EventHandler(this.deleteAllButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.deleteAllButton);
             this.Controls.Add(this.testButton);
             this.Controls.Add(this.utworz10CzasteczkeButton);
             this.Controls.Add(this.utworzCzasteczkeButton);
@@ -108,6 +119,8 @@ namespace Lattice_boltzmann
         private System.Windows.Forms.Button utworzCzasteczkeButton;
         private System.Windows.Forms.Button utworz10CzasteczkeButton;
         private System.Windows.Forms.Button testButton;
+        private System.Windows.Forms.Button deleteAllButton;
+        public static System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
