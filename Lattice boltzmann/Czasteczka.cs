@@ -54,7 +54,7 @@ namespace Lattice_boltzmann
                                 if (Rysowanie.czasteczka[i].Lokalizacja.X == (int)rectangleF.X && Rysowanie.czasteczka[i].Lokalizacja.Y == (int)rectangleF.Y)
                                 { //warunek kolizji
 
-                                    //prawo zachowania pedu
+                                    //prawo zachowania pedu i energii
                                     int m1 = Masa; int v1 = Szybkosc;
                                     int m2 = Rysowanie.czasteczka[i].Masa; int v2 = Rysowanie.czasteczka[i].Szybkosc;
                                     int u1 = v1 * (m1 - m2) / (m1 + m2) + (2 * m2 * v2) / (m1 + m2);
@@ -171,18 +171,26 @@ namespace Lattice_boltzmann
         public bool warunkiRuchu()
         {
             var picturebox = Form1.pictureBox1;
-            /*if (Lokalizacja.X >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y >= picturebox.Height - Rysowanie.rozmiarCzasteczki || Lokalizacja.X < 0 || Lokalizacja.Y < 0 ||
-                Lokalizacja.X + Szybkosc >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y + Szybkosc >= picturebox.Height - Rysowanie.rozmiarCzasteczki  ||
-                 Lokalizacja.X - Szybkosc >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y - Szybkosc >= picturebox.Height - Rysowanie.rozmiarCzasteczki ||
-                 Lokalizacja.X - Szybkosc < 0 || Lokalizacja.Y - Szybkosc < 0)
-            {
-                Kierunek = -Kierunek;
-                return false;
-            }*/
-            //Graphics g = Form1.pictureBox1.CreateGraphics();
-           
+        /*if (Lokalizacja.X >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y >= picturebox.Height - Rysowanie.rozmiarCzasteczki || Lokalizacja.X < 0 || Lokalizacja.Y < 0 ||
+            Lokalizacja.X + Szybkosc >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y + Szybkosc >= picturebox.Height - Rysowanie.rozmiarCzasteczki  ||
+             Lokalizacja.X - Szybkosc >= picturebox.Width - Rysowanie.rozmiarCzasteczki || Lokalizacja.Y - Szybkosc >= picturebox.Height - Rysowanie.rozmiarCzasteczki ||
+             Lokalizacja.X - Szybkosc < 0 || Lokalizacja.Y - Szybkosc < 0)
+        {
+            Kierunek = -Kierunek;
+            return false;
+        }*/
+        //Graphics g = Form1.pictureBox1.CreateGraphics();
+        nowaBitmapa:
             Bitmap b = new Bitmap(picturebox.ClientSize.Width, picturebox.Height);
-            picturebox.DrawToBitmap(b, picturebox.RectangleToScreen(picturebox.ClientRectangle));//picturebox.ClientRectangle);
+            try
+            {
+                picturebox.DrawToBitmap(b, picturebox.RectangleToScreen(picturebox.ClientRectangle));//picturebox.ClientRectangle);
+            }
+            catch 
+            {
+                    goto nowaBitmapa;
+            }
+            
             Color colour = new Color();
             int x=-1;
             int y=-1;
@@ -192,7 +200,8 @@ namespace Lattice_boltzmann
                 {
                     case 1: // lewo
                         {
-                            x = Lokalizacja.X - i;
+                           // x = Lokalizacja.X - i;
+                            x = Lokalizacja.X + i;
                             y = Lokalizacja.Y;
                             
                         }
@@ -206,7 +215,7 @@ namespace Lattice_boltzmann
                         break;
                     case -1: // prawo
                         {
-                            x = Lokalizacja.X + i;
+                            x = Lokalizacja.X - i;
                             y = Lokalizacja.Y;
                             
 
@@ -221,7 +230,8 @@ namespace Lattice_boltzmann
                         break;
                 }
 
-                if (x > picturebox.Width - Rysowanie.rozmiarCzasteczki || y > picturebox.Height - Rysowanie.rozmiarCzasteczki || x <= 0 || y <= 0)
+                if (x > picturebox.Width - Rysowanie.rozmiarCzasteczki || y > picturebox.Height - Rysowanie.rozmiarCzasteczki || x <= 0 || y <= 0
+                    || (x == picturebox.Width / 3 && (y < picturebox.Height / 2 - 40 || y > picturebox.Height / 2 + 30))) 
                 {
                     Kierunek = -Kierunek;
                     return true;
@@ -236,8 +246,11 @@ namespace Lattice_boltzmann
                 }
                 
             }
-           
+
+            
+            
             b.Dispose();
+            GC.Collect(); //garbage collector - zmniejsza znacznie użycie process memory w tym zadaniu
             return true;
         }
 

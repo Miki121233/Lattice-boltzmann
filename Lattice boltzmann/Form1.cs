@@ -18,7 +18,13 @@ namespace Lattice_boltzmann
             {
                 Rysowanie.czasteczka[i].ruch();
             }
-            
+            Graphics g = pictureBox1.CreateGraphics();
+            //g.DrawLine(new Pen(Color.Black), pictureBox1.Width / 3, 0, pictureBox1.Width / 3, pictureBox1.Height);
+            g.DrawLine(new Pen(Color.Black), pictureBox1.Width / 3, 0, pictureBox1.Width / 3, pictureBox1.Height/2-40);
+            g.DrawLine(new Pen(Color.Black), pictureBox1.Width / 3, pictureBox1.Height / 2 + 30, pictureBox1.Width / 3, pictureBox1.Height);
+            //obszar po lewej x1 = 0, x2 = width/3, y1 = height
+            //obszar niedostepny 
+
         }
 
         private void utworzCzasteczkeButton_Click(object sender, EventArgs e)
