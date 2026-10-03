@@ -71,6 +71,15 @@ public class BrushStrokeTests
     public void Invalid_size_is_rejected(int size) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => BrushStroke.Cells(0, 0, 1, 1, size, 10, 10));
 
+    [Theory]
+    [InlineData(0, 10)]
+    [InlineData(10, 0)]
+    [InlineData(-1, 10)]
+    [InlineData(10, -1)]
+    [InlineData(-5, -5)]
+    public void Non_positive_grid_is_rejected(int gridWidth, int gridHeight) =>
+        Assert.Throws<ArgumentOutOfRangeException>(() => BrushStroke.Cells(0, 0, 3, 3, 1, gridWidth, gridHeight));
+
     [Fact]
     public void Drawn_diagonal_wall_is_impermeable()
     {

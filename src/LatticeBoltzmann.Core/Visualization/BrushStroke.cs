@@ -26,10 +26,12 @@ public static class BrushStroke
     /// <param name="x1">Column of the end cell.</param>
     /// <param name="y1">Row of the end cell.</param>
     /// <param name="size">Brush size from <see cref="MinSize"/> to <see cref="MaxSize"/>; 1 is one cell, 2 a plus shape.</param>
-    /// <param name="gridWidth">Grid width in cells.</param>
-    /// <param name="gridHeight">Grid height in cells.</param>
+    /// <param name="gridWidth">Grid width in cells, at least 1.</param>
+    /// <param name="gridHeight">Grid height in cells, at least 1.</param>
     /// <returns>The painted cells; empty when the stroke misses the grid.</returns>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="size"/> is outside its allowed range.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="size"/> is outside its allowed range, or a grid dimension is not positive.
+    /// </exception>
     public static IReadOnlyList<(int X, int Y)> Cells(int x0, int y0, int x1, int y1, int size, int gridWidth, int gridHeight)
     {
         if (size < MinSize || size > MaxSize)
@@ -38,6 +40,16 @@ public static class BrushStroke
                 nameof(size),
                 size,
                 $"Rozmiar pędzla musi mieścić się w przedziale od {MinSize} do {MaxSize}.");
+        }
+
+        if (gridWidth < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(gridWidth), gridWidth, "Szerokość siatki musi być dodatnia.");
+        }
+
+        if (gridHeight < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(gridHeight), gridHeight, "Wysokość siatki musi być dodatnia.");
         }
 
         var footprint = Footprints[size - MinSize];
@@ -51,7 +63,7 @@ public static class BrushStroke
                 var x = cx + dx;
                 var y = cy + dy;
 
-                // Unsigned comparison also rejects negative coordinates, and an empty grid rejects everything.
+                // The grid dimensions are positive (checked above), so the unsigned comparison also rejects negative coordinates.
                 if ((uint)x < (uint)gridWidth && (uint)y < (uint)gridHeight && seen.Add((x, y)))
                 {
                     cells.Add((x, y));
