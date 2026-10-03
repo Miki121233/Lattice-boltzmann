@@ -16,8 +16,9 @@ public sealed class DiffusionSimulation
 
     // Populations of cell (x, y) direction i live at index (y * Width + x) * D2Q9.Q + i.
     // Wall cells hold zeros in both buffers.
-    private readonly double[] _f;
-    private readonly double[] _next;
+    // The two buffers swap roles after every step, so they cannot be readonly.
+    private double[] _f;
+    private double[] _next;
     private readonly bool[] _wall;
     private double _diffusionCoefficient;
 
@@ -160,6 +161,26 @@ public sealed class DiffusionSimulation
         }
     }
 
+    /// <summary>
+    /// Advances the simulation by the given number of steps. Each step relaxes the populations of every fluid cell
+    /// towards equilibrium (BGK collision) and streams them to the neighbouring cells; populations that would enter
+    /// a wall or leave the grid are bounced back, so the walls and the grid border are impermeable.
+    /// </summary>
+    /// <param name="steps">Number of steps, at least 1.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="steps"/> is less than 1.</exception>
+    public void Advance(int steps = 1)
+    {
+        if (steps < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(steps), steps, "Liczba kroków musi wynosić co najmniej 1.");
+        }
+
+        for (var step = 0; step < steps; step++)
+        {
+            Step();
+        }
+    }
+
     private static void ValidateDiffusionCoefficient(double value, string paramName)
     {
         if (!double.IsFinite(value) || value < MinDiffusionCoefficient || value > MaxDiffusionCoefficient)
@@ -169,6 +190,63 @@ public sealed class DiffusionSimulation
                 value,
                 "Współczynnik dyfuzji musi być liczbą z przedziału od 0,05 do 0,5.");
         }
+    }
+
+    private void Step()
+    {
+        var f = _f;
+        var next = _next;
+        var wall = _wall;
+        var width = Width;
+        var height = Height;
+        var omega = 1.0 / RelaxationTime;
+        var ex = D2Q9.Ex;
+        var ey = D2Q9.Ey;
+        var weights = D2Q9.Weights;
+        var opposite = D2Q9.Opposite;
+
+        // Every fluid slot receives exactly one contribution below, but wall slots are never written
+        // and must stay zero in both buffers, so the target buffer is cleared first.
+        Array.Clear(next);
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var cell = (y * width) + x;
+                if (wall[cell])
+                {
+                    continue;
+                }
+
+                var offset = cell * D2Q9.Q;
+                double concentration = 0;
+                for (var i = 0; i < D2Q9.Q; i++)
+                {
+                    concentration += f[offset + i];
+                }
+
+                for (var i = 0; i < D2Q9.Q; i++)
+                {
+                    var fi = f[offset + i];
+                    var post = fi - ((fi - (weights[i] * concentration)) * omega);
+                    var tx = x + ex[i];
+                    var ty = y + ey[i];
+                    if ((uint)tx < (uint)width && (uint)ty < (uint)height && !wall[(ty * width) + tx])
+                    {
+                        next[(((ty * width) + tx) * D2Q9.Q) + i] = post;
+                    }
+                    else
+                    {
+                        // Bounce-back: the population returns into its own cell with reversed direction.
+                        next[offset + opposite[i]] = post;
+                    }
+                }
+            }
+        }
+
+        (_f, _next) = (next, f);
+        StepCount++;
     }
 
     private int CellIndex(int x, int y)
