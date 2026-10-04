@@ -26,24 +26,29 @@ internal sealed partial class MainForm : Form
     private int _gap = DefaultGap;
     private double _diffusion = DefaultDiffusion;
     private int _stepsPerFrame = DefaultStepsPerFrame;
+    private bool _updatingControls;
 
     public MainForm()
     {
+        AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
         Text = "Lattice Boltzmann — dyfuzja";
         MinimumSize = new Size(960, 600);
 
-        View = new SimulationView { Dock = DockStyle.Fill };
+        View = new SimulationView();
         _statusLabel = new ToolStripStatusLabel();
         _statusStrip = new StatusStrip();
         _statusStrip.Items.Add(_statusLabel);
-        Controls.Add(View);
-        Controls.Add(_statusStrip);
+        BuildLayout();
 
         _timer = new System.Windows.Forms.Timer { Interval = FrameIntervalMs };
         _timer.Tick += OnTimerTick;
 
         ResetSimulation();
+        UpdateDiffusionLabel();
+        UpdateGapLabel();
+        UpdateBrushLabel();
+        ConnectControls();
     }
 
     [Browsable(false)]
@@ -79,12 +84,14 @@ internal sealed partial class MainForm : Form
     public void StartSimulation()
     {
         _timer.Start();
+        StartPauseButton.Text = "Pauza";
         UpdateStatus();
     }
 
     public void StopSimulation()
     {
         _timer.Stop();
+        StartPauseButton.Text = "Start";
         UpdateStatus();
     }
 
@@ -113,6 +120,27 @@ internal sealed partial class MainForm : Form
         UpdateStatus();
     }
 
+    internal bool HandleShortcut(Keys keyData)
+    {
+        switch (keyData)
+        {
+            case Keys.Space:
+                ToggleSimulation();
+                return true;
+            case Keys.N:
+                StepOnce();
+                return true;
+            case Keys.R:
+                ResetSimulation();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData) =>
+        HandleShortcut(keyData) || base.ProcessCmdKey(ref msg, keyData);
+
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
         _timer.Stop();
@@ -125,6 +153,7 @@ internal sealed partial class MainForm : Form
         {
             _timer.Stop();
             _timer.Dispose();
+            _toolTip.Dispose();
         }
 
         base.Dispose(disposing);
@@ -136,6 +165,80 @@ internal sealed partial class MainForm : Form
         View.RefreshField();
         UpdateStatus();
     }
+
+    private void ConnectControls()
+    {
+        StartPauseButton.Click += (_, _) => ToggleSimulation();
+        StepButton.Click += (_, _) => StepOnce();
+        ResetButton.Click += (_, _) => ResetSimulation();
+        DiffusionTrackBar.ValueChanged += OnDiffusionChanged;
+        GapTrackBar.ValueChanged += OnGapChanged;
+        ResolutionComboBox.SelectedIndexChanged += OnResolutionChanged;
+        StepsPerFrameInput.ValueChanged += (_, _) => StepsPerFrame = (int)StepsPerFrameInput.Value;
+        BrushTrackBar.ValueChanged += OnBrushChanged;
+    }
+
+    private void OnDiffusionChanged(object? sender, EventArgs e)
+    {
+        _diffusion = DiffusionTrackBar.Value / 100.0;
+        Simulation.DiffusionCoefficient = _diffusion;
+        UpdateDiffusionLabel();
+    }
+
+    private void OnGapChanged(object? sender, EventArgs e)
+    {
+        if (_updatingControls)
+        {
+            return;
+        }
+
+        _gap = GapTrackBar.Value;
+        PartitionedBox.ApplyGap(Simulation, _gap);
+        View.RefreshField();
+        UpdateGapLabel();
+    }
+
+    private void OnResolutionChanged(object? sender, EventArgs e)
+    {
+        var index = ResolutionComboBox.SelectedIndex;
+        if (index < 0)
+        {
+            return;
+        }
+
+        var (newWidth, newHeight) = Resolutions[index];
+        var newGap = Math.Clamp((int)Math.Round(_gap * newHeight / (double)_gridHeight), 0, newHeight / 2);
+        _gridWidth = newWidth;
+        _gridHeight = newHeight;
+        _gap = newGap;
+        ResetSimulation();
+
+        _updatingControls = true;
+        try
+        {
+            GapTrackBar.Maximum = newHeight / 2;
+            GapTrackBar.Value = newGap;
+        }
+        finally
+        {
+            _updatingControls = false;
+        }
+
+        UpdateGapLabel();
+    }
+
+    private void OnBrushChanged(object? sender, EventArgs e)
+    {
+        View.BrushSize = BrushTrackBar.Value;
+        UpdateBrushLabel();
+    }
+
+    private void UpdateDiffusionLabel() =>
+        DiffusionLabel.Text = $"D = {_diffusion.ToString("0.00", Polish)} (τ = {Simulation.RelaxationTime.ToString("0.00", Polish)})";
+
+    private void UpdateGapLabel() => GapLabel.Text = $"Szerokość otworu: {_gap}";
+
+    private void UpdateBrushLabel() => BrushLabel.Text = $"Rozmiar pędzla: {View.BrushSize}";
 
     private void UpdateStatus() => _statusLabel.Text = StatusText;
 }
