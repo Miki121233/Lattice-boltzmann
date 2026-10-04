@@ -6,7 +6,10 @@ namespace LatticeBoltzmann.App;
 internal sealed partial class MainForm
 {
     private const int PanelWidth = 280;
-    private const int ControlWidth = 240;
+    private const int ControlWidth = 210;
+
+    // Every group has this one width: panel minus a 17 px vertical scrollbar and the 3 px margins of the flow panel.
+    private const int GroupWidth = PanelWidth - 17 - 6 - 2;
 
     private static readonly (int Width, int Height)[] Resolutions = [(120, 72), (200, 120), (300, 180), (400, 240)];
 
@@ -60,7 +63,7 @@ internal sealed partial class MainForm
     {
         var table = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1 };
         table.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, LogicalToDeviceUnits(PanelWidth)));
+        table.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, PanelWidth));
         table.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
         View.Dock = DockStyle.Fill;
@@ -74,6 +77,9 @@ internal sealed partial class MainForm
             WrapContents = false,
             AutoScroll = true,
         };
+        // Only vertical scrolling may ever appear.
+        panel.HorizontalScroll.Enabled = false;
+        panel.HorizontalScroll.Visible = false;
         panel.Controls.Add(BuildSimulationGroup());
         panel.Controls.Add(BuildParametersGroup());
         panel.Controls.Add(BuildDrawingGroup());
@@ -105,11 +111,11 @@ internal sealed partial class MainForm
             Minimum = MinStepsPerFrame,
             Maximum = MaxStepsPerFrame,
             Value = DefaultStepsPerFrame,
-            Width = LogicalToDeviceUnits(80),
+            Width = 80,
         };
         GapTrackBar = CreateTrackBar(0, DefaultGridHeight / 2, DefaultGap);
         GapLabel = CreateLabel(string.Empty);
-        ResolutionComboBox = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = LogicalToDeviceUnits(ControlWidth) };
+        ResolutionComboBox = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = ControlWidth };
         foreach (var (width, height) in Resolutions)
         {
             ResolutionComboBox.Items.Add($"{width} × {height}");
@@ -120,6 +126,7 @@ internal sealed partial class MainForm
         var flow = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.TopDown, WrapContents = false };
         flow.Controls.AddRange(
         [
+            CreateLabel("Współczynnik dyfuzji"),
             DiffusionLabel,
             DiffusionTrackBar,
             CreateLabel("Kroki na klatkę"),
@@ -146,46 +153,47 @@ internal sealed partial class MainForm
         return CreateGroup("Rysowanie", flow);
     }
 
-    private GroupBox BuildLegendGroup()
+    private static GroupBox BuildLegendGroup()
     {
-        var legend = new ColorLegend { Width = LogicalToDeviceUnits(ControlWidth) };
+        var legend = new ColorLegend { Width = ControlWidth };
         return CreateGroup("Legenda", legend);
     }
 
     private Button CreateButton(string text, string tip)
     {
-        var button = new Button { Text = text, Width = LogicalToDeviceUnits(76), Height = LogicalToDeviceUnits(30) };
+        var button = new Button { Text = text, Width = 76, Height = 30 };
         _toolTip.SetToolTip(button, tip);
         return button;
     }
 
-    private TrackBar CreateTrackBar(int minimum, int maximum, int value) => new()
+    private static TrackBar CreateTrackBar(int minimum, int maximum, int value) => new()
     {
         Minimum = minimum,
         Maximum = maximum,
         Value = value,
         TickStyle = TickStyle.None,
         AutoSize = false,
-        Width = LogicalToDeviceUnits(ControlWidth),
-        Height = LogicalToDeviceUnits(28),
+        Width = ControlWidth,
+        Height = 28,
     };
 
-    private Label CreateLabel(string text) => new()
+    private static Label CreateLabel(string text) => new()
     {
         Text = text,
         AutoSize = true,
-        MaximumSize = new Size(LogicalToDeviceUnits(ControlWidth), 0),
+        MaximumSize = new Size(ControlWidth, 0),
     };
 
-    private GroupBox CreateGroup(string title, Control content)
+    private static GroupBox CreateGroup(string title, Control content)
     {
         var group = new GroupBox
         {
             Text = title,
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
-            Padding = new Padding(LogicalToDeviceUnits(6)),
-            Width = LogicalToDeviceUnits(PanelWidth - 30),
+            Padding = new Padding(6),
+            MinimumSize = new Size(GroupWidth, 0),
+            MaximumSize = new Size(GroupWidth, 0),
         };
         content.Dock = DockStyle.Top;
         group.Controls.Add(content);

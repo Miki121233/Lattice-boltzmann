@@ -56,8 +56,14 @@ internal sealed class SimulationView : Control
         get => _brushSize;
         set
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, BrushStroke.MinSize);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, BrushStroke.MaxSize);
+            if (value < BrushStroke.MinSize || value > BrushStroke.MaxSize)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    value,
+                    $"Rozmiar pędzla musi być z przedziału od {BrushStroke.MinSize} do {BrushStroke.MaxSize}.");
+            }
+
             _brushSize = value;
         }
     }

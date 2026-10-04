@@ -205,9 +205,8 @@ public sealed class DiffusionSimulation
         var weights = D2Q9.Weights;
         var opposite = D2Q9.Opposite;
 
-        // Every fluid slot receives exactly one contribution below, but wall slots are never written
-        // and must stay zero in both buffers, so the target buffer is cleared first.
-        Array.Clear(next);
+        // No clearing of the target buffer: every fluid slot is written exactly once below, and wall slots
+        // are zero in both buffers (SetWall clears both, the constructor starts zeroed) and never written.
 
         for (var y = 0; y < height; y++)
         {

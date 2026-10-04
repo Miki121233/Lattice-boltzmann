@@ -30,16 +30,21 @@ internal sealed partial class MainForm : Form
 
     public MainForm()
     {
+        // Designer pattern: everything is built in logical (96 DPI) pixels and WinForms scales it once on ResumeLayout.
+        SuspendLayout();
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
         Text = "Lattice Boltzmann — dyfuzja";
-        MinimumSize = new Size(960, 600);
 
         View = new SimulationView();
         _statusLabel = new ToolStripStatusLabel();
         _statusStrip = new StatusStrip();
         _statusStrip.Items.Add(_statusLabel);
         BuildLayout();
+        MinimumSize = new Size(960, 600);
+        ClientSize = new Size(1200, 760);
+        ResumeLayout(false);
+        PerformLayout();
 
         _timer = new System.Windows.Forms.Timer { Interval = FrameIntervalMs };
         _timer.Tick += OnTimerTick;
@@ -75,8 +80,14 @@ internal sealed partial class MainForm : Form
         get => _stepsPerFrame;
         set
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, MinStepsPerFrame);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, MaxStepsPerFrame);
+            if (value < MinStepsPerFrame || value > MaxStepsPerFrame)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    value,
+                    $"Liczba kroków na klatkę musi być z przedziału od {MinStepsPerFrame} do {MaxStepsPerFrame}.");
+            }
+
             _stepsPerFrame = value;
         }
     }
@@ -138,6 +149,8 @@ internal sealed partial class MainForm : Form
         }
     }
 
+    // Space/N/R are intercepted form-wide by design (spec 4.1), so Space toggles Start/Pauza
+    // even when another button has focus.
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData) =>
         HandleShortcut(keyData) || base.ProcessCmdKey(ref msg, keyData);
 

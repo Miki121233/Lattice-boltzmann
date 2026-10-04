@@ -18,6 +18,17 @@ public class MainFormTests
     });
 
     [Fact]
+    public void Panel_groups_share_one_width_that_leaves_room_for_a_scrollbar() => StaThread.Run(() =>
+    {
+        using var form = new MainForm();
+        var panel = form.StartPauseButton.Parent!.Parent!.Parent!;
+        var groups = panel.Controls.OfType<GroupBox>().ToList();
+        Assert.Equal(4, groups.Count);
+        Assert.Single(groups.Select(g => g.Width).Distinct());
+        Assert.True(groups[0].Width + SystemInformation.VerticalScrollBarWidth <= 280);
+    });
+
+    [Fact]
     public void StepOnce_advances_one_step_and_updates_status() => StaThread.Run(() =>
     {
         using var form = new MainForm();

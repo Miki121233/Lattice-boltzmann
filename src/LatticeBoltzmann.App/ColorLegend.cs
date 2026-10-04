@@ -12,7 +12,6 @@ internal sealed class ColorLegend : Control
     {
         DoubleBuffered = true;
         ResizeRedraw = true;
-        Height = LogicalToDeviceUnits(64);
     }
 
     protected override Size DefaultSize => new(200, 64);
@@ -43,7 +42,7 @@ internal sealed class ColorLegend : Control
         if (_gradient is not null)
         {
             g.InterpolationMode = InterpolationMode.NearestNeighbor;
-            g.DrawImageUnscaled(_gradient, pad, barTop);
+            g.DrawImage(_gradient, new Rectangle(pad, barTop, barWidth, barHeight));
         }
 
         g.DrawRectangle(borderPen, pad, barTop, barWidth - 1, barHeight - 1);
