@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/LatticeBoltzmann.App/LatticeBoltzmann.App.csproj" />
     <Project Path="src/LatticeBoltzmann.Core/LatticeBoltzmann.Core.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/LatticeBoltzmann.App.Tests/LatticeBoltzmann.App.Tests.csproj" />
     <Project Path="tests/LatticeBoltzmann.Core.Tests/LatticeBoltzmann.Core.Tests.csproj" />
   </Folder>
 </Solution>
